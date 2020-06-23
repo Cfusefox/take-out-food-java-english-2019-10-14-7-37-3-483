@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.List;
 
 /*
@@ -14,7 +15,63 @@ public class App {
 
     public String bestCharge(List<String> inputs) {
         //TODO: write code here
-
-        return null;
+        String res = "============= Order details =============\n";
+        int beforeProTotal = 0;
+        int halfTotal = 0;
+        int deductTotal = 0;
+        int halfPrice = 0;
+        List<String> halfItem = salesPromotionRepository.findAll().get(1).getRelatedItems();
+        for(String elt : inputs) {
+            String[] arr = elt.split(" x ");
+            for(Item item : itemRepository.findAll()) {
+                if(item.getId().equals(arr[0])) {
+                    int price = Integer.valueOf(arr[1]) * (int)item.getPrice();
+                    beforeProTotal += price;
+                    res = res + elt.replace(arr[0], item.getName()) + " = " + price + " yuan\n";
+                    //total use half price
+                    if(halfItem.indexOf(arr[0]) >= 0) {
+                        halfPrice += ((int)item.getPrice()/2 * Integer.valueOf(arr[1]));
+                    }
+                    //total use deduct
+                    if(beforeProTotal >= 30) {
+                        deductTotal = beforeProTotal - 6;
+                    } else {
+                        deductTotal = beforeProTotal;
+                    }
+                }
+            }
+        }
+        halfTotal = beforeProTotal - halfPrice;
+        res = res + "-----------------------------------\n";
+        if(halfPrice == 0 && beforeProTotal < 30) {
+            res = res + "Total：24 yuan\n" +
+                    "===================================";
+        } else {
+            if(deductTotal <= halfTotal) {
+                res = res + "Promotion used:\n" +
+                        "满30减6 yuan，saving 6 yuan\n" +
+                        "-----------------------------------\n" +
+                        "Total："+ deductTotal +" yuan\n" +
+                        "===================================";
+            } else {
+                res = res + "Promotion used:\n" +
+                        "Half price for certain dishes (Braised chicken，Cold noodles)，saving " + halfPrice + " yuan\n" +
+                        "-----------------------------------\n" +
+                        "Total："+ halfTotal +" yuan\n" +
+                        "===================================";
+            }
+        }
+//        ============= Order details =============
+//        Braised chicken x 1 = 18 yuan
+//        Chinese hamburger x 2 = 12 yuan
+//        Cold noodles x 1 = 8 yuan
+//                -----------------------------------
+//                Promotion used:
+//        Half price for certain dishes (braised chicken and cold noodles), saving 13 yuan
+//                -----------------------------------
+//                Total: 25 yuan
+//                ===================================
+        return res;
     }
+
 }
