@@ -1,4 +1,5 @@
-import java.util.Arrays;
+
+
 import java.util.List;
 
 /*
@@ -20,6 +21,7 @@ public class App {
         int halfTotal = 0;
         int deductTotal = 0;
         int halfPrice = 0;
+        String halfThings = "";
         List<String> halfItem = salesPromotionRepository.findAll().get(1).getRelatedItems();
         for(String elt : inputs) {
             String[] arr = elt.split(" x ");
@@ -30,6 +32,11 @@ public class App {
                     res = res + elt.replace(arr[0], item.getName()) + " = " + price + " yuan\n";
                     //total use half price
                     if(halfItem.indexOf(arr[0]) >= 0) {
+                        if(halfThings == "") {
+                            halfThings = halfThings + item.getName();
+                        } else {
+                            halfThings =  halfThings + "£¬" + item.getName();
+                        }
                         halfPrice += ((int)item.getPrice()/2 * Integer.valueOf(arr[1]));
                     }
                     //total use deduct
@@ -44,20 +51,20 @@ public class App {
         halfTotal = beforeProTotal - halfPrice;
         res = res + "-----------------------------------\n";
         if(halfPrice == 0 && beforeProTotal < 30) {
-            res = res + "Totalï¼š24 yuan\n" +
+            res = res + "Total£º"+ beforeProTotal +" yuan\n" +
                     "===================================";
         } else {
             if(deductTotal <= halfTotal) {
                 res = res + "Promotion used:\n" +
-                        "æ»¡30å‡6 yuanï¼Œsaving 6 yuan\n" +
+                        "Âú30¼õ6 yuan£¬saving 6 yuan\n" +
                         "-----------------------------------\n" +
-                        "Totalï¼š"+ deductTotal +" yuan\n" +
+                        "Total£º"+ deductTotal +" yuan\n" +
                         "===================================";
             } else {
                 res = res + "Promotion used:\n" +
-                        "Half price for certain dishes (Braised chickenï¼ŒCold noodles)ï¼Œsaving " + halfPrice + " yuan\n" +
+                        "Half price for certain dishes ("+ halfThings +")£¬saving " + halfPrice + " yuan\n" +
                         "-----------------------------------\n" +
-                        "Totalï¼š"+ halfTotal +" yuan\n" +
+                        "Total£º"+ halfTotal +" yuan\n" +
                         "===================================";
             }
         }
